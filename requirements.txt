@@ -1,6 +1,4 @@
-argparse==1.2.1
 mock==1.0.1
 py==1.4.26
 pytest==2.6.4
 requests==2.4.3
-wsgiref==0.1.2
