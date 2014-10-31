@@ -34,6 +34,9 @@ class Pyasp(object):
 				for idx, viewstate in enumerate(self.viewstates):
 					headers['__VIEWSTATE{}'.format(idx + 1)] = self.viewstates[idx]
 
+			if self.eventvalidation is not None:
+				headers['__EVENTVALIDATION'] = self.eventvalidation
+
 		# issue the request
 		response = methods[method](url, headers=headers)
 

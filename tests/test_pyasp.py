@@ -111,6 +111,18 @@ class TestPyasp(unittest.TestCase):
 
 		with pytest.raises(AssertionError):
 			mock_requests.get.assert_called_with(url, headers={'__VIEWSTATE': TestPyasp.SAMPLE_B64})
+
+	@mock.patch('pyasp.pyasp.requests')
+	def test_eventvalidation_is_not_sent_on_get(self, mock_requests):
+		"""Does the library skip the __EVENTVALIDATION
+		field when issuing a GET request?"""
+		url = TestPyasp.ANY_URL
+		self.pyasp.eventvalidation = TestPyasp.SAMPLE_B64
+
+		self.pyasp.get(TestPyasp.ANY_URL)
+
+		with pytest.raises(AssertionError):
+			mock_requests.get.assert_called_with(url, headers={'__EVENTVALIDATION': TestPyasp.SAMPLE_B64})
 		
 
 	@mock.patch('pyasp.pyasp.requests')
@@ -136,4 +148,14 @@ class TestPyasp(unittest.TestCase):
 
 		mock_requests.post.assert_called_with(url,
 			headers={'__VIEWSTATE1': TestPyasp.SAMPLE_B64, '__VIEWSTATE2': TestPyasp.SAMPLE_B64_2})
-		
+
+	@mock.patch('pyasp.pyasp.requests')
+	def test_eventvalidation_is_sent_on_post(self, mock_requests):
+		"""Does the library send the __EVENTVALIDATION
+		field when issuing a POST request?"""
+		url = TestPyasp.ANY_URL
+		self.pyasp.eventvalidation = TestPyasp.SAMPLE_B64
+
+		self.pyasp.post(TestPyasp.ANY_URL)
+
+		mock_requests.post.assert_called_with(url, headers={'__EVENTVALIDATION': TestPyasp.SAMPLE_B64})
