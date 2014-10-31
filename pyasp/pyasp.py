@@ -18,8 +18,11 @@ class Pyasp(object):
 	def post(self, url):
 		return self.__request(method='post', url=url)
 
+	def put(self, url):
+		return self.__request(method='put', url=url)
+
 	def __request(self, method, url):
-		methods = {'get': requests.get, 'post': requests.post}
+		methods = {'get': requests.get, 'post': requests.post, 'put': requests.put}
 
 		response = methods[method](url)
 		try:

@@ -51,6 +51,15 @@ class TestPyasp(unittest.TestCase):
 		
 		mock_requests.post.assert_called_with(url)
 
+	@mock.patch('pyasp.pyasp.requests')
+	def test_put(self, mock_requests):
+		"""Are PUT requests being issued correctly?"""
+		url = TestPyasp.ANY_URL
+
+		self.pyasp.put(url)
+		
+		mock_requests.put.assert_called_with(url)
+
 	@responses.activate
 	def test_single_viewstate_parsing(self):
 		"""Does the library correctly parse a single
