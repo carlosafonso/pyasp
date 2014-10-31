@@ -87,3 +87,15 @@ class TestPyasp(unittest.TestCase):
 		assert len(self.pyasp.viewstates) == 2
 		assert self.pyasp.viewstates[0] == TestPyasp.SAMPLE_B64
 		assert self.pyasp.viewstates[1] == TestPyasp.SAMPLE_B64_2
+
+	@responses.activate
+	def test_eventvalidation_parsing(self):
+		"""Does the library correctly parse the
+		__EVENTVALIDATION field?"""
+		responses.add(
+			responses.GET, TestPyasp.ANY_URL,
+			body='<html><body><input type="hidden" name="__EVENTVALIDATION" value="{}"/></body></html>'.format(TestPyasp.SAMPLE_B64))
+
+		self.pyasp.get(TestPyasp.ANY_URL)
+
+		assert self.pyasp.eventvalidation == TestPyasp.SAMPLE_B64

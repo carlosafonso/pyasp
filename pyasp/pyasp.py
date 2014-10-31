@@ -28,10 +28,14 @@ class Pyasp(object):
 		try:
 			soup = BeautifulSoup(response.text)
 
-			tags = soup.find_all('input', {'name': re.compile('__VIEWSTATE(\d+)?')})
-			if len(tags):
-				for tag in tags:
+			viewstate_tags = soup.find_all('input', {'name': re.compile('__VIEWSTATE(\d+)?')})
+			if len(viewstate_tags):
+				for tag in viewstate_tags:
 					self.viewstates.append(tag['value'])
+
+			eventvalidation_tag = soup.find('input', {'name': '__EVENTVALIDATION'})
+			if eventvalidation_tag is not None:
+				self.eventvalidation = eventvalidation_tag['value']
 
 		except TypeError:
 			pass
