@@ -8,6 +8,7 @@ from pyasp.pyasp import Pyasp
 
 class TestPyasp(unittest.TestCase):
 	ANY_URL = "http://anyurl"
+	ANY_URL_2 = "http://anyurl2"
 	ANY_RESPONSE_BODY = "<html><body></body></html>"
 	SAMPLE_B64 = "ZmluZ2VycyBjcm9zc2VkLCB0aGlzIHRlc3Qgc2hhbGwgbm90IGZhaWwh"
 	SAMPLE_B64_2 = "eW91ciBhZCBoZXJlISBjb250YWN0IHVzIQ=="
@@ -159,3 +160,23 @@ class TestPyasp(unittest.TestCase):
 		self.pyasp.post(TestPyasp.ANY_URL)
 
 		mock_requests.post.assert_called_with(url, headers={'__EVENTVALIDATION': TestPyasp.SAMPLE_B64})
+
+	@responses.activate
+	def test_viewstates_are_cleared_after_each_request(self):
+		"""Are captured __VIEWSTATE fields cleared
+		after each request?"""
+		responses.add(
+			responses.GET, TestPyasp.ANY_URL,
+			body='<html><body><input type="hidden" name="__VIEWSTATE" value="{}"/>' \
+				'<input type="hidden" name="__EVENTVALIDATION" value="{}"/></body></html>'
+					.format(TestPyasp.SAMPLE_B64, TestPyasp.SAMPLE_B64_2))
+
+		responses.add(
+			responses.GET, TestPyasp.ANY_URL_2,
+			body='<html><body><input type="hidden" name="__VIEWSTATE" value="{}"/></body></html>'.format(TestPyasp.SAMPLE_B64_2))
+
+		self.pyasp.get(TestPyasp.ANY_URL)
+		self.pyasp.get(TestPyasp.ANY_URL_2)
+
+		assert len(self.pyasp.viewstates) == 1
+		assert self.pyasp.eventvalidation is None

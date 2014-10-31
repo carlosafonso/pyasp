@@ -42,6 +42,9 @@ class Pyasp(object):
 
 		# parse any __VIEWSTATE and __EVENTVALIDATION fields
 		try:
+			self.viewstates = []
+			self.eventvalidation = None
+
 			soup = BeautifulSoup(response.text)
 
 			viewstate_tags = soup.find_all('input', {'name': re.compile('__VIEWSTATE(\d+)?')})
