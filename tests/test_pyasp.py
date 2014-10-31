@@ -40,7 +40,7 @@ class TestPyasp(unittest.TestCase):
 
 		self.pyasp.get(url)
 		
-		mock_requests.get.assert_called_with(url)
+		mock_requests.get.assert_called_with(url, headers={})
 
 	@mock.patch('pyasp.pyasp.requests')
 	def test_post(self, mock_requests):
@@ -49,7 +49,7 @@ class TestPyasp(unittest.TestCase):
 
 		self.pyasp.post(url)
 		
-		mock_requests.post.assert_called_with(url)
+		mock_requests.post.assert_called_with(url, headers={})
 
 	@mock.patch('pyasp.pyasp.requests')
 	def test_put(self, mock_requests):
@@ -58,7 +58,7 @@ class TestPyasp(unittest.TestCase):
 
 		self.pyasp.put(url)
 		
-		mock_requests.put.assert_called_with(url)
+		mock_requests.put.assert_called_with(url, headers={})
 
 	@responses.activate
 	def test_single_viewstate_parsing(self):
@@ -99,3 +99,41 @@ class TestPyasp(unittest.TestCase):
 		self.pyasp.get(TestPyasp.ANY_URL)
 
 		assert self.pyasp.eventvalidation == TestPyasp.SAMPLE_B64
+
+	@mock.patch('pyasp.pyasp.requests')
+	def test_single_viewstate_is_not_sent_on_get(self, mock_requests):
+		"""Does the library skip a single parsed
+		__VIEWSTATE field when issuing a GET request?"""
+		url = TestPyasp.ANY_URL
+		self.pyasp.viewstates.append(TestPyasp.SAMPLE_B64)
+
+		self.pyasp.get(TestPyasp.ANY_URL)
+
+		with pytest.raises(AssertionError):
+			mock_requests.get.assert_called_with(url, headers={'__VIEWSTATE': TestPyasp.SAMPLE_B64})
+		
+
+	@mock.patch('pyasp.pyasp.requests')
+	def test_single_viewstate_is_sent_on_post(self, mock_requests):
+		"""Does the library send a single parsed 
+		__VIEWSTATE field when issuing a POST request?"""
+		url = TestPyasp.ANY_URL
+		self.pyasp.viewstates.append(TestPyasp.SAMPLE_B64)
+
+		self.pyasp.post(TestPyasp.ANY_URL)
+
+		mock_requests.post.assert_called_with(url, headers={'__VIEWSTATE': TestPyasp.SAMPLE_B64})
+
+	@mock.patch('pyasp.pyasp.requests')
+	def test_multiple_viewstates_are_sent_on_post(self, mock_requests):
+		"""Does the library send all parsed __VIEWSTATE
+		fields when issuing a POST request?"""
+		url = TestPyasp.ANY_URL
+		self.pyasp.viewstates.append(TestPyasp.SAMPLE_B64)
+		self.pyasp.viewstates.append(TestPyasp.SAMPLE_B64_2)
+
+		self.pyasp.post(TestPyasp.ANY_URL)
+
+		mock_requests.post.assert_called_with(url,
+			headers={'__VIEWSTATE1': TestPyasp.SAMPLE_B64, '__VIEWSTATE2': TestPyasp.SAMPLE_B64_2})
+		

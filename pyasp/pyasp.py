@@ -22,9 +22,22 @@ class Pyasp(object):
 		return self.__request(method='put', url=url)
 
 	def __request(self, method, url):
+		# all available HTTP methods
 		methods = {'get': requests.get, 'post': requests.post, 'put': requests.put}
+		
+		# add any captured __VIEWSTATE field to POST requests only
+		headers = {}
+		if method == 'post':
+			if len(self.viewstates) == 1:
+				headers['__VIEWSTATE'] = self.viewstates[0]
+			elif len(self.viewstates) > 1:
+				for idx, viewstate in enumerate(self.viewstates):
+					headers['__VIEWSTATE{}'.format(idx + 1)] = self.viewstates[idx]
 
-		response = methods[method](url)
+		# issue the request
+		response = methods[method](url, headers=headers)
+
+		# parse any __VIEWSTATE and __EVENTVALIDATION fields
 		try:
 			soup = BeautifulSoup(response.text)
 
