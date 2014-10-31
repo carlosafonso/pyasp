@@ -10,6 +10,7 @@ class TestPyasp(unittest.TestCase):
 	ANY_URL = "http://anyurl"
 	ANY_RESPONSE_BODY = "<html><body></body></html>"
 	SAMPLE_B64 = "ZmluZ2VycyBjcm9zc2VkLCB0aGlzIHRlc3Qgc2hhbGwgbm90IGZhaWwh"
+	SAMPLE_B64_2 = "eW91ciBhZCBoZXJlISBjb250YWN0IHVzIQ=="
 
 	def setup_method(self, method):
 		self.pyasp = Pyasp()
@@ -63,3 +64,17 @@ class TestPyasp(unittest.TestCase):
 		assert len(self.pyasp.viewstates) == 1
 		assert self.pyasp.viewstates[0] == TestPyasp.SAMPLE_B64
 
+	@responses.activate
+	def test_multiple_viewstate_parsing(self):
+		"""Does the library correctly parse several
+		__VIEWSTATE fields?"""
+		responses.add(
+			responses.POST, TestPyasp.ANY_URL,
+			body='<html><body><input type="hidden" name="__VIEWSTATE1" value="{}"/>' \
+				'<input type="hidden" name="__VIEWSTATE2" value="{}"/></body></html>'.format(TestPyasp.SAMPLE_B64, TestPyasp.SAMPLE_B64_2))
+
+		self.pyasp.post(TestPyasp.ANY_URL)
+
+		assert len(self.pyasp.viewstates) == 2
+		assert self.pyasp.viewstates[0] == TestPyasp.SAMPLE_B64
+		assert self.pyasp.viewstates[1] == TestPyasp.SAMPLE_B64_2

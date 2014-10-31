@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 
 from bs4 import BeautifulSoup
@@ -24,9 +25,11 @@ class Pyasp(object):
 		try:
 			soup = BeautifulSoup(response.text)
 
-			tag = soup.find('input', {'name': '__VIEWSTATE'})
-			if tag is not None:
-				self.viewstates = [tag['value']]
+			tags = soup.find_all('input', {'name': re.compile('__VIEWSTATE(\d+)?')})
+			if len(tags):
+				for tag in tags:
+					self.viewstates.append(tag['value'])
+
 		except TypeError:
 			pass
 
