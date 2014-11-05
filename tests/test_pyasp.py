@@ -168,3 +168,36 @@ class TestPyasp(unittest.TestCase):
 
 		assert len(self.pyasp.viewstates) == 1
 		assert self.pyasp.eventvalidation is None
+
+	@mock.patch('pyasp.pyasp.requests')
+	def test_get_with_custom_headers(self, mock_requests):
+		"""Are custom headers sent when issuing
+		GET requests?"""
+		url = TestPyasp.ANY_URL
+		custom_headers = {'X-My-Get-Header': 'value'}
+
+		self.pyasp.get(url, custom_headers)
+
+		mock_requests.get.assert_called_with(url, headers=custom_headers)
+
+	@mock.patch('pyasp.pyasp.requests')
+	def test_post_with_custom_headers(self, mock_requests):
+		"""Are custom headers sent when issuing
+		POST requests?"""
+		url = TestPyasp.ANY_URL_2
+		custom_headers = {'X-My-Post-Header': 'value'}
+
+		self.pyasp.post(url, custom_headers)
+
+		mock_requests.post.assert_called_with(url, headers=custom_headers)
+
+	@mock.patch('pyasp.pyasp.requests')
+	def test_put_with_custom_headers(self, mock_requests):
+		"""Are custom headers sent when issuing
+		PUT requests?"""
+		url = TestPyasp.ANY_URL
+		custom_headers = {'X-My-Put-Header': 'value'}
+
+		self.pyasp.put(url, custom_headers)
+
+		mock_requests.put.assert_called_with(url, headers=custom_headers)

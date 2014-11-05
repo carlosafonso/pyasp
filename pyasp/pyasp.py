@@ -9,21 +9,23 @@ class Pyasp(object):
 		self.viewstates = []
 		self.eventvalidation = None
 
-	def get(self, url):
-		return self.__request(method='get', url=url)
+	def get(self, url, headers=None):
+		return self.__request(method='get', url=url, headers=headers)
 
-	def post(self, url):
-		return self.__request(method='post', url=url)
+	def post(self, url, headers=None):
+		return self.__request(method='post', url=url, headers=headers)
 
-	def put(self, url):
-		return self.__request(method='put', url=url)
+	def put(self, url, headers=None):
+		return self.__request(method='put', url=url, headers=headers)
 
-	def __request(self, method, url):
+	def __request(self, method, url, headers=None):
 		# all available HTTP methods
 		methods = {'get': requests.get, 'post': requests.post, 'put': requests.put}
 		
+		if headers is None:
+			headers = {}
+		
 		# add any captured __VIEWSTATE field to POST requests only
-		headers = {}
 		if method == 'post':
 			if len(self.viewstates) == 1:
 				headers['__VIEWSTATE'] = self.viewstates[0]
