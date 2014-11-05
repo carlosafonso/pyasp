@@ -5,10 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 class Pyasp(object):
-	DEFAULT_COOKIEJAR = "/tmp/pyasp.cookiejar"
-
-	def __init__(self, cookiejar=DEFAULT_COOKIEJAR):
-		self.cookiejar = cookiejar
+	def __init__(self):
 		self.viewstates = []
 		self.eventvalidation = None
 

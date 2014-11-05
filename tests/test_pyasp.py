@@ -17,18 +17,6 @@ class TestPyasp(unittest.TestCase):
 		self.pyasp = Pyasp()
 		responses.reset()
 
-	def test_default_cookie_jar(self):
-		"""Does the library use the default cookie
-		jar file if none is specified?"""
-		assert self.pyasp.cookiejar == Pyasp.DEFAULT_COOKIEJAR
-
-	def test_custom_cookie_jar(self):
-		"""Does the library use the specified cookie
-		jar file if one is provided?"""
-		self.pyasp = Pyasp(cookiejar="/tmp/customjar")
-
-		assert self.pyasp.cookiejar == "/tmp/customjar"
-
 	def test_state_vars_empty_on_init(self):
 		"""Are all state variables correctly initialized?"""
 		assert self.pyasp.viewstates == []
